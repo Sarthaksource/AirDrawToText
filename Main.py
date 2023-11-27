@@ -30,11 +30,6 @@ cv2.createTrackbar("Min Value", "Color Match", 49, 255, setVal)
 #List to store points
 bpoints = [deque(maxlen=1024)]
 
-
-xval = []
-yval = []
-offset = 10
-
 #Index used to mark the points in bpoints
 index = 0
 
@@ -43,11 +38,6 @@ colors = (0, 0, 0)
 
 #For Canvas setup
 paintWindow = np.zeros((471,636,3)) + 255
-#Background rectangle of Clear All
-#paintWindow = cv2.rectangle(paintWindow, (200,1), (300,65), (0,0,0), 2)
-#Clear All Text
-#cv2.putText(paintWindow, "CLEAR ALL", (210, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-#cv2.namedWindow('Paint', cv2.WINDOW_AUTOSIZE)
 
 #kernel later used for dilation/eroding
 kernel = np.ones((5,5),np.uint8)
@@ -55,23 +45,6 @@ kernel = np.ones((5,5),np.uint8)
 def matchVal(val):
     Alpha = {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: 'A', 11: 'B', 12: 'D', 13: 'E', 14: 'G', 15: 'I', 16: 'J', 17: 'K', 18: 'L', 19: 'M', 20: 'N', 21: 'P', 22: 'R', 23: 'S', 24: 'T', 25: 'U', 26: 'V', 27: 'X', 28: 'samadengan'}
     return (Alpha[val])
-
-def enhancer():
-    img = cv2.imread('C:/Users/DELL/Documents/WordRecog/result.png')
-    
-    # special color
-    colors = [(255, 255, 255)]
-
-    # all other colors
-    mask = np.zeros(img.shape[:2], dtype=bool)
-
-    for color in colors:   
-        mask |= (img == color).all(-1)
-
-    img[~mask] = (0,0,0)
-
-    #cv2.imshow("Image",img)
-    cv2.imwrite("result.png",img)
 
 #Used for resizing(cv2 resize) captured frame
 def get_frame(cam, factor):
@@ -88,32 +61,12 @@ def save_image(filename, image):
     size = 128
     image = imutils.resize(image, width=size)
     cv2.imwrite(filename, image)
-    im = Image.open("result1.png")
+    im = Image.open("result.png")
     mergedImage = Image.new("RGB",(416, 416))
     mergedImage.paste(im, (0, 0))
     mergedImage.save("Test//detected.png")
 
-    #image = cv2.resize(image, (84, 84), 0, 0, interpolation = cv2.INTER_CUBIC)
-    #image = cv2.resize(image, (56, 56), 0, 0, interpolation = cv2.INTER_NEAREST_EXACT)
-    #image = cv2.resize(image, (28, 28), 0, 0, interpolation = cv2.INTER_NEAREST_EXACT)
-    #image = Image.open(filename)
-    #image.save("test-300.png", dpi=(300,300))
-    #print(f"Image saved as {filename}")
-
 def load_image():
-    #loaded_model = tf.keras.models.load_model('C:/Users/DELL/Documents/Hand_Model_Test/mnist_cnn_model.h5')
-
-    #now we are going to read images it with open cv
-    #enhancer()
-    #img=cv2.imread('C:/Users/DELL/Documents/WordRecog/result.png')[:,:,0]#all of it and 1st and last one
-    #img=np.invert(np.array([img]))#invert black to white in images so that model wont get confues
-    #prediction = loaded_model.predict(img)
-    #print("----------------")
-    #print("The predicted value is : ",np.argmax(prediction))
-    #print("----------------")
-    #plt.imshow(img[0],cmap=plt.cm.binary)#change the color in black and white
-    #plt.show()
-
     SEGMENTATION_ENGINE = YOLO("best.pt")
     RESULT=SEGMENTATION_ENGINE.predict(source="Test",save=True,save_txt=True, project="Test",name="ab")
     with open("Test//ab//labels//detected.txt","r") as file:
@@ -147,7 +100,6 @@ if __name__ == '__main__':
         #Creating Rectangular Box and Text on Live Frame
         frame = cv2.rectangle(frame, (200,1), (300,65), (122,122,122), -1)
         cv2.putText(frame, "CLEAR ALL", (210, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-            
 
         #Creating mask
         mask = cv2.inRange(hsv, min_hsv, max_hsv)
@@ -176,11 +128,6 @@ if __name__ == '__main__':
             #M['m10'] is for x coordinates summation, M['m01'] for y coordinates summation
             #& M['m00'] for total area
             center = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
-
-            xval.append(center[0])
-            yval.append(center[1])
-            #xval.append(int(x))
-            #yval.append(int(y))
             
             #Checking if the user clicks on the clear button
             if center[1] <= 65:
@@ -226,7 +173,7 @@ if __name__ == '__main__':
         #Get user key input, if Esc then break
         c = cv2.waitKey(100)
         if(c==83 | c==115):
-            save_image("result1.png", paintWindow)
+            save_image("result.png", paintWindow)
             load_image()
         if(c==27):
             break
