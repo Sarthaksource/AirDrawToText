@@ -164,8 +164,6 @@ if __name__ == '__main__':
         final = cv2.medianBlur(final, 5)
 
         #Show results
-        #cv2.imshow("Final Image", final)
-        #cv2.moveWindow("Final Image", int(1366/2), int(768/2))
         cv2.imshow("Original Image", frame)
         #cv2.moveWindow("Original Image", 0, 0)
         cv2.imshow("Paint", paintWindow)
